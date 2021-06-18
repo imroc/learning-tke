@@ -1,6 +1,6 @@
 ---
 title: 常见问题
-type: book  # Do not modify.
+type: book
 weight: 10
 ---
 
