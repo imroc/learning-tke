@@ -77,7 +77,9 @@ CLB 回环可能导致的问题现象有：
 
 ## VPC-CNI 的 LB 直通 Pod 是否也存在这个问题？
 
-TKE 通常用的 Global Router 网络模式(网桥方案)，还有一种是 VPC-CNI (弹性网卡方案)。目前 LB 直通 Pod 只支持 VPC-CNI 的 Pod，即 LB 不绑 NodePort 作为 rs，而是直接绑定后端 Pod 作为 rs：![enter image description here](http://km.oa.com/files/photos/pictures/202008/1596278639_90_w670_h730.png)<br />
+TKE 通常用的 Global Router 网络模式(网桥方案)，还有一种是 VPC-CNI (弹性网卡方案)。目前 LB 直通 Pod 只支持 VPC-CNI 的 Pod，即 LB 不绑 NodePort 作为 rs，而是直接绑定后端 Pod 作为 rs：
+
+![](5.png)
 
 这样就绕过了 NodePort，不会像之前一样可能会转发给任意节点。但如果 client 与 server 在同一节点，也一样还是可能会发生回环，通过反亲和可以规避。
 
