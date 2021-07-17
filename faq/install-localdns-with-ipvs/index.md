@@ -258,20 +258,50 @@ IPVS 模式集群由于需要为所有 Service 在 `kube-ipvs0` 这个 dummy 网
 --cluster-dns=169.254.20.10
 ```
 
-如果让新增的节点都默认修改 kubelet 参数呢？可以在加节点时设置【自定义数据】(即自定义初始化脚本)，会在节点组件初始化好后执行:
-
-![](1.png)
-
-脚本内容:
+可以通过以下脚本进行修改并重启 kubelet 来生效:
 
 ```bash
 sed -i 's/CLUSTER_DNS.*/CLUSTER_DNS="--cluster-dns=169.254.20.10"/' /etc/kubernetes/kubelet
 systemctl restart kubelet
 ```
 
-每个节点都贴以下脚本过于麻烦，一般建议使用节点池，在节电池定义节点的【自定义数据】，这样就可以让节点池扩容出来的节点都会执行这个脚本，无需每个节点都单独设置。
+### 存量节点修改
 
+如何修改集群中已有节点的 kubelet 参数呢？目前没有产品化解决方案，可以自行通过第三方工具来修改，通常使用 ansible，安装方式参考 [官方文档: Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) 。
 
-更好的方案是使用产品化支持的 kubelet 参数自定义，在 TKE 已经支持，参考 [TKE 文档: 自定义 Kubernetes 组件启动参数](https://cloud.tencent.com/document/product/457/47775#.E8.AE.BE.E7.BD.AE.E8.8A.82.E7.82.B9.E7.9A.84.E8.87.AA.E5.AE.9A.E4.B9.89-kubelet-.E5.8F.82.E6.95.B0)
+安装好 ansible 之后，按照以下步骤操作:
 
-> **注:** 需要提交工单开白名单使用。
+1. 导出所有节点 IP 到 `hosts.ini`:
+
+```bash
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' | tr ' ' '\n' > hosts.ini
+```
+
+2. 准备脚本 `modify-kubelet.sh`:
+
+```bash
+sed -i 's/CLUSTER_DNS.*/CLUSTER_DNS="--cluster-dns=169.254.20.10"/' /etc/kubernetes/kubelet
+systemctl restart kubelet
+```
+
+3. 准备可以用于节点登录的 ssh 秘钥或密码 (秘钥改名为 key，并执行 `chmod 0600 key`)
+4. 使用 ansible 在所有节点上运行脚本 `modify-kubelet.sh`:
+    * 使用秘钥的示例:
+    ```bash
+   ansible all -i hosts.ini --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --user root --private-key=key -m script -a "modify-kubelet.sh"
+    ```
+   * 使用密码的示例:
+   ```bash
+   ansible all -i hosts.ini --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" -m script --extra-vars "ansible_user=root ansible_password=yourpassword" -a "modify-kubelet.sh"
+   ```
+   > **注:** 如果节点使用的 ubuntu 系统，默认 user 是 ubuntu，可以自行替换下，另外 ansible 参数再加上 `--become --become-user=root` 以便让 ansible 执行脚本时拥有 root 权限，避免操作失败。
+
+### 增量节点修改
+
+如何让新增的节点都默认修改 kubelet 参数呢？可以在加节点时设置【自定义数据】(即自定义初始化脚本)，会在节点组件初始化好后执行:
+
+![](1.png)
+
+每个节点都贴一下脚本过于麻烦，一般建议使用节点池，在创建节电池时指定节点的【自定义数据】，这样就可以让节点池里扩容出来的节点都执行下这个脚本，而无需每个节点都单独设置:
+
+![](2.png)
