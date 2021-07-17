@@ -287,13 +287,13 @@ systemctl restart kubelet
 3. 准备可以用于节点登录的 ssh 秘钥或密码 (秘钥改名为 key，并执行 `chmod 0600 key`)
 4. 使用 ansible 在所有节点上运行脚本 `modify-kubelet.sh`:
     * 使用秘钥的示例:
-    ```bash
-   ansible all -i hosts.ini --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --user root --private-key=key -m script -a "modify-kubelet.sh"
-    ```
+      ```bash
+      ansible all -i hosts.ini --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --user root --private-key=key -m script -a "mo  dify-kubelet.sh"
+      ```
    * 使用密码的示例:
-   ```bash
-   ansible all -i hosts.ini --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" -m script --extra-vars "ansible_user=root ansible_password=yourpassword" -a "modify-kubelet.sh"
-   ```
+     ```bash
+     ansible all -i hosts.ini --ssh-common-args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" -m script --extra-vars "ansible_user=root an  sible_password=yourpassword" -a "modify-kubelet.sh"
+     ```
    > **注:** 如果节点使用的 ubuntu 系统，默认 user 是 ubuntu，可以自行替换下，另外 ansible 参数再加上 `--become --become-user=root` 以便让 ansible 执行脚本时拥有 root 权限，避免操作失败。
 
 ### 增量节点修改
@@ -305,3 +305,9 @@ systemctl restart kubelet
 每个节点都贴一下脚本过于麻烦，一般建议使用节点池，在创建节电池时指定节点的【自定义数据】，这样就可以让节点池里扩容出来的节点都执行下这个脚本，而无需每个节点都单独设置:
 
 ![](2.png)
+
+## 关于存量 Pod
+
+集群中正在运行的存量 Pod 还是会使用旧的集群 DNS，等重建后会自动切换到 localdns，新创建的 Pod 也都会默认使用 localdns。
+
+一般没特别需要的情况下，可以不管存量 Pod，等下次更新， Pod 重建后就会自动切换到 localdns；如果想要立即切换，可以将工作负载滚动更新触发 Pod 重建来实现手动切换。
