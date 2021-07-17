@@ -311,3 +311,7 @@ systemctl restart kubelet
 集群中正在运行的存量 Pod 还是会使用旧的集群 DNS，等重建后会自动切换到 localdns，新创建的 Pod 也都会默认使用 localdns。
 
 一般没特别需要的情况下，可以不管存量 Pod，等下次更新， Pod 重建后就会自动切换到 localdns；如果想要立即切换，可以将工作负载滚动更新触发 Pod 重建来实现手动切换。
+
+## 参考资料
+
+* [Using NodeLocal DNSCache in Kubernetes clusters](https://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/)
