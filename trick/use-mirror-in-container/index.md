@@ -74,7 +74,7 @@ EOF
 
 **下面是各发行版的软件源替换方法**
 
-### Debian 10:
+### Debian 10
 ```bash
 cat > /etc/apt/sources.list <<'EOF'
 deb http://mirrors.tencentyun.com/debian buster main contrib non-free
@@ -91,7 +91,7 @@ deb http://mirrors.tencentyun.com/debian-security buster/updates main contrib no
 EOF
 ```
 
-### Debian 9:
+### Debian 9
 
 ```bash
 cat > /etc/apt/sources.list <<'EOF'
