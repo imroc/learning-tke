@@ -1,5 +1,5 @@
 ---
-title: "IPVS 转发模式的集群如何安装 NodeLocal DNS Cache"
+title: "IPVS 转发模式的集群如何使用 NodeLocal DNS Cache"
 type: book
 date: "2021-07-17"
 ---
