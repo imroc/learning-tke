@@ -30,6 +30,8 @@ TKE 已经支持了接入层组件的优雅停机能力，即在 Pod 删除过�
 service.cloud.tencent.com/enable-grace-shutdown: true
 ```
 
+> 参考 [TKE 官方文档: Service 优雅停机](https://cloud.tencent.com/document/product/457/60064)
+
 **Ingress:**
 
 如果使用的 TKE 默认类型的 Ingress (CLB Ingress)，可以给 Ingress 加上下面这个注解:
@@ -37,3 +39,5 @@ service.cloud.tencent.com/enable-grace-shutdown: true
 ```yaml
 ingress.cloud.tencent.com/enable-grace-shutdown: true
 ```
+
+> 参考 [TKE 官方文档: Ingress 优雅停机](https://cloud.tencent.com/document/product/457/60065)
