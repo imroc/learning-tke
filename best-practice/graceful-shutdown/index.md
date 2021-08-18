@@ -41,3 +41,5 @@ ingress.cloud.tencent.com/enable-grace-shutdown: true
 ```
 
 > 参考 [TKE 官方文档: Ingress 优雅停机](https://cloud.tencent.com/document/product/457/60065)
+
+通常长连接可能维持较长时间，而 k8s 删除 Pod 默认是等待 30s ，如果还未完全退出就强制杀死，可以根据业务情况自行 [调整优雅时长](https://imroc.cc/k8s/best-practice/graceful-shutdown/#%E8%B0%83%E6%95%B4%E4%BC%98%E9%9B%85%E6%97%B6%E9%95%BF) (terminationGracePeriodSeconds)。
