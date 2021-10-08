@@ -20,5 +20,5 @@ kubectl get nodes -o=jsonpath='{range .items[?(@.metadata.labels.failure-domain\
 
 查看各节点 ENI 的子网网段:
 ```bash
-kubectl get node -o json | jq -r '.items[] | { name: .metadata.name, subnetCIDR: [.status.eniInfos[].subnetCIDR]|join(",") }| "\(.name)\t\(.subnetCIDR)"'
+kubectl get nec -o json | jq -r '.items[] | select(.status.eniInfos!=null)| { name: .metadata.name, subnetCIDR: [.status.eniInfos[].subnetCIDR]|join(",") }| "\(.name)\t\(.subnetCIDR)"'
 ```
