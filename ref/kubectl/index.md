@@ -20,5 +20,15 @@ kubectl get nodes -o=jsonpath='{range .items[?(@.metadata.labels.failure-domain\
 
 查看各节点 ENI 的子网网段:
 ```bash
-kubectl get nec -o json | jq -r '.items[] | select(.status.eniInfos!=null)| { name: .metadata.name, subnetCIDR: [.status.eniInfos[].subnetCIDR]|join(",") }| "\(.name)\t\(.subnetCIDR)"'
+kubectl get nec -o json | jq -r '.items[] | select(.status.eniInfos!=null)| { name: .metadata.name, zone: , subnetCIDR: [.status.eniInfos[].subnetCIDR]|join(",") }| "\(.name)\t\(.subnetCIDR)"'
+```
+
+查可以绑指定子网ENI的节点都是在哪个可用区:
+```bash
+# 查询哪些节点可以绑这个子网的 ENI
+kubectl get nec -o json | jq -r '.items[] | select(.status.eniInfos!=null)| { name: .metadata.name, subnetCIDR: [.status.eniInfos[].subnetCIDR]|join(",") }| "\(.name)\t\(.subnetCIDR)"' | grep 11.167.0.0/20 | awk '{print $1}' > node-cidr.txt
+# 查询所有节点的可用区
+kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.failure-domain\.beta\.kubernetes\.io\/zone}{"\n"}{end}' > node-zone.txt
+# 筛选出可以绑这个子网的节点都是在哪个可用区
+awk 'BEGIN{while(getline<"node-cidr.txt") a[$1]=1;} {if(a[$1]==1) print $0;}' node-zone.txt
 ```
