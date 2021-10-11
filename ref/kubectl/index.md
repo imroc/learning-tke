@@ -39,3 +39,26 @@ awk 'BEGIN{while(getline<"node-cidr.txt") a[$1]=1;} {if(a[$1]==1) print $0;}' no
 subnetCIDR="11.185.48.0/20"
 kubectl get nec -o json | jq -r '.items[] | select(.status.eniInfos!=null)| { name: .metadata.name, subnetCIDR: [.status.eniInfos[].subnetCIDR]|join(",") }| "\(.name)\t\(.subnetCIDR)"' | grep $subnetCIDR | awk '{print $1}' > node-cidr.txt && kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.failure-domain\.beta\.kubernetes\.io\/zone}{"\n"}{end}' > node-zone.txt &&  awk 'BEGIN{while(getline<"node-cidr.txt") a[$1]=1;} {if(a[$1]==1) print $0;}' node-zone.txt
 ```
+
+## EKS 相关
+
+查看 eks 集群子网剩余 ip 数量:
+```bash
+kubectl get node -o json | jq -r '.items[] | {subnet: .metadata.annotations."eks.tke.cloud.tencent.com/subnet-id", ip: .metadata.labels."eks.tke.cloud.tencent.com/available-ip-count"} |  "\(.subnet)\t\(.ip)"'
+```
+
+查看指定子网剩余 ip 数量
+```bash
+# 直接替换子网 id 查
+kubectl get node -o json | jq -r '.items[] | select(.metadata.annotations."eks.tke.cloud.tencent.com/subnet-id"=="subnet-1p9zhi9g") | {ip: .metadata.labels."eks.tke.cloud.tencent.com/available-ip-count"} |  "\(.ip)"'
+
+# 使用变量查
+subnet="subnet-1p9zhi9g"
+kubectl get node -o json | jq -r '.items[] | {subnet: .metadata.annotations."eks.tke.cloud.tencent.com/subnet-id", ip: .metadata.labels."eks.tke.cloud.tencent.com/available-ip-count"} |  "\(.subnet)\t\(.ip)"' | grep $subnet | awk '{print $2}'
+```
+
+查看指定固定 IP 的 Pod 所在子网剩余 IP 数量:
+```bash
+pod="wedata-lineage-service-test-env-48872523-0"
+kubectl get cm static-addresses -o json | jq -r ".data.\"${pod}\"" | xargs kubectl get node -o json | jq -r '{ip: .metadata.labels."eks.tke.cloud.tencent.com/available-ip-count"} |  "\(.ip)"'
+```
