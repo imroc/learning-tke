@@ -2,6 +2,7 @@
 title: "使用海外容器镜像"
 type: book
 date: "2021-05-14"
+draft: true
 weigth: 10
 ---
 
