@@ -2,7 +2,6 @@
 title: "使用海外容器镜像"
 type: book
 date: "2021-05-14"
-draft: true
 weigth: 10
 ---
 
@@ -16,8 +15,6 @@ weigth: 10
 
 | 海外镜像仓库地址 | 腾讯云映射地址 |
 |:----|:----|
-| gcr.io | gcr.tencentcloudcr.com |
-| k8s.gcr.io | k8s.tencentcloudcr.com |
 | quay.io | quay.tencentcloudcr.com |
 | nvcr.io | nvcr.tencentcloudcr.com |
 
@@ -38,10 +35,6 @@ weigth: 10
       [plugins.cri.registry.mirrors]
         [plugins.cri.registry.mirrors."quay.io"]
           endpoint = ["https://quay.tencentcloudcr.com"]
-        [plugins.cri.registry.mirrors."k8s.gcr.io"]
-          endpoint = ["https://k8s.tencentcloudcr.com"]
-        [plugins.cri.registry.mirrors."gcr.io"]
-          endpoint = ["https://gcr.tencentcloudcr.com"]
         [plugins.cri.registry.mirrors."nvcr.io"]
           endpoint = ["https://nvcr.tencentcloudcr.com"]
         [plugins.cri.registry.mirrors."docker.io"]
@@ -56,8 +49,6 @@ weigth: 10
 
 ```bash
 sed -i '/\[plugins\.cri\.registry\.mirrors\]/ a\\ \ \ \ \ \ \ \ [plugins.cri.registry.mirrors."quay.io"]\n\ \ \ \ \ \ \ \ \ \ endpoint = ["https://quay.tencentcloudcr.com"]' /etc/containerd/config.toml
-sed -i '/\[plugins\.cri\.registry\.mirrors\]/ a\\ \ \ \ \ \ \ \ [plugins.cri.registry.mirrors."gcr.io"]\n\ \ \ \ \ \ \ \ \ \ endpoint = ["https://gcr.tencentcloudcr.com"]' /etc/containerd/config.toml
-sed -i '/\[plugins\.cri\.registry\.mirrors\]/ a\\ \ \ \ \ \ \ \ [plugins.cri.registry.mirrors."k8s.gcr.io"]\n\ \ \ \ \ \ \ \ \ \ endpoint = ["https://k8s.tencentcloudcr.com"]' /etc/containerd/config.toml
 sed -i '/\[plugins\.cri\.registry\.mirrors\]/ a\\ \ \ \ \ \ \ \ [plugins.cri.registry.mirrors."nvcr.io"]\n\ \ \ \ \ \ \ \ \ \ endpoint = ["https://nvcr.tencentcloudcr.com"]' /etc/containerd/config.toml
 systemctl restart containerd
 ```
